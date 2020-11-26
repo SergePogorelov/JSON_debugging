@@ -1,26 +1,3 @@
-# JSON_debugging
-
-### Скрипт, позволяющий проверить JSON-данные по JSON-схеме.
-
-## Установка на локальном компьютере
-Эти инструкции помогут вам создать копию проекта и запустить ее на локальном компьютере для целей разработки и тестирования.
-
-### Запуск проекта (на примере Linux)
-
-Перед тем, как начать: если вы не пользуетесь `Python 3`, вам нужно будет установить инструмент `virtualenv` при помощи `pip install virtualenv`. 
-Если вы используете `Python 3`, у вас уже должен быть модуль [venv](https://docs.python.org/3/library/venv.html), установленный в стандартной библиотеке.
-
-- Создайте на своем компютере папку проекта foodgram `mkdir JSON_debugging` и перейдите в нее `cd JSON_debugging`
-- Склонируйте этот репозиторий в текущую папку `git clone https://github.com/SergePogorelov/JSON_debugging .`
-- Создайте виртуальное окружение `python3 -m venv venv`
-- Активируйте виртуальное окружение `source venv/bin/activate`
-- Установите зависимости `pip install -r requirements.txt`
-- Запустите скрипт `python jsondebugging.py`
-
-Результы работы скрипта будут сохранены в файл `JSON_debug_<текущие дата и время>`.
-
-**Пример файла:**
-```
 #1. Checking the file: 3ade063d-d1b9-453f-85b4-dda7bfda4711.json
 --------------------
 ERROR: The schema for the file was not found.
@@ -144,9 +121,3 @@ SOLUTION: Add a value with the correct data type: 'object'.
 
 ********************
 
-```
-
-## В разработке использованы
-
-- [Python](https://www.python.org/)
-- [jsonschema](https://github.com/Julian/jsonschema)
