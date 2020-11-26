@@ -20,63 +20,56 @@ def get_json_data(f):
     json_data = open_json_file(f.path)
 
     if json_data is None:
-        return "ERROR: The file is empty.", None
+        return None, "ERROR: The file is empty."
 
     if not isinstance(json_data, dict):
-        return "ERROR: Invalid data format in the file.", None
+        return None, "ERROR: Invalid data format in the file."
 
-    return None, json_data
+    return json_data, None
 
 
 def get_schema(json_data):
     event = json_data.get("event")
 
     if not event:
-        return "ERROR: There is no 'event' in the file.", None
+        return None, "ERROR: There is no 'event' in the file."
 
     schema = open_json_file(SCHEMA_PATH + event + ".schema")
 
     if isinstance(schema, FileNotFoundError):
-        return "ERROR: The schema for the file was not found.", None
+        return None, "ERROR: The schema for the file was not found."
 
-    return None, schema
+    return schema, None
 
 
 def check_json_data(schema, json_data):
     try:
         Draft7Validator.check_schema(schema)
     except SchemaError as error:
-        log_file.write("ERROR: Invalid schema:\n" + error.message + SEPARATOR)
-        return
+        return "ERROR: Invalid schema:\n" + error.message
 
     validator = Draft7Validator(schema)
     errors = list(validator.iter_errors(json_data))
 
-    if not errors:
-        log_file.write("OK: No errors found." + SEPARATOR)
-        return
+    if errors:
+        errors = [error.message for error in errors]
+        return "ERRORS IN JSON DATA:\n" + "\n".join(errors)
 
-    log_file.write("ERRORS IN JSON DATA: \n")
-    for error in errors:
-        log_file.write(error.message + "\n")
-
-    log_file.write(SEPARATOR)
+    return "OK: No errors found."
 
 
 def check_file(f, log_file):
-    error_message, json_data = get_json_data(f)
+    json_data, error_message = get_json_data(f)
 
     if error_message:
-        log_file.write(error_message + SEPARATOR)
-        return
+        return error_message
 
-    error_message, schema = get_schema(json_data)
+    schema, error_message = get_schema(json_data)
 
     if error_message:
-        log_file.write(error_message + SEPARATOR)
-        return
+        return error_message
 
-    check_json_data(schema, json_data)
+    return check_json_data(schema, json_data)
 
 
 if __name__ == "__main__":
@@ -92,5 +85,8 @@ if __name__ == "__main__":
     with open(file_name, "w") as log_file:
         for i, f in enumerate(os.scandir(JSON_PATH)):
             if f.is_file() and os.path.splitext(f.path)[1] == ".json":
-                log_file.write(f"#{i+1}. Checking the file: {f.name}\n")
-                check_file(f, log_file)
+                log_file.write(
+                    f"#{i+1}. Checking the file: {f.name}\n"
+                    + check_file(f, log_file)
+                    + SEPARATOR
+                )
